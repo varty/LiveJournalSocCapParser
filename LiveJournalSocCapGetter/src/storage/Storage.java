@@ -29,13 +29,13 @@ public class Storage implements StorageInterface {
 
 	@Override
 	public void printData(String date) throws IOException {
-		FileOutputStream fOutput=new FileOutputStream(new File("./LiveJournalSocCap/RESULT_"+date+".txt"));
+		FileOutputStream fOutput=new FileOutputStream(new File("./RESULT_"+date+".txt"));
 		BufferedWriter bWriter=new BufferedWriter(new OutputStreamWriter(fOutput,"UTF-8"));
-		int number=1;
+		//int number=1;
 		for(Map.Entry<String, String> entry : map.entrySet()){
-			bWriter.append(number+": "+entry.getKey()+" "+entry.getValue());
+			bWriter.append(entry.getKey()+" "+entry.getValue());
 			bWriter.append("\r\n");
-			number++;
+			//number++;
 		}
 		bWriter.flush();
 		bWriter.close();
@@ -53,7 +53,7 @@ public class Storage implements StorageInterface {
 	public void printError(String date){
 		if (errors!=null){
 			try{
-				FileOutputStream fOutput=new FileOutputStream((new File("./LiveJournalSocCap/ERROR_"+date+".txt")));
+				FileOutputStream fOutput=new FileOutputStream((new File("./ERROR_"+date+".txt")));
 				BufferedWriter bWriter=new BufferedWriter(new OutputStreamWriter(fOutput,"UTF-8"));
 				for (int i=0; i<errors.size();i++){
 					bWriter.append(errors.get(i)+"\r\n");
