@@ -2,7 +2,7 @@ package parser;
 
 public class LJParserFactory {
 	
-	public static LJParser getLJParserInstance(){
+	public static LJParserInterface getLJParserInstance(){
 		return new LJParserImpl();
 	}
 	

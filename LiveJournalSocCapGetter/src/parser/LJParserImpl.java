@@ -2,7 +2,6 @@ package parser;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -10,12 +9,11 @@ import org.jsoup.select.Elements;
 
 import storage.StorageInterface;
 
-public class LJParserImpl implements LJParser{
+public class LJParserImpl implements LJParserInterface{
 
 	private String urlString;
-	private StorageInterface storage;
+	private LinkedHashMap<String,String> pagesMap=new LinkedHashMap<>();
 	
-	private final String pageAttr="&page=";
 	private final int countUser=20;
 	
 	private final String usersTableQuery="body > div.s-layout.s-logged-out > div.s-body > div.s-main.b-service > div > div > table > tbody > tr > td > table > tbody";
@@ -24,56 +22,47 @@ public class LJParserImpl implements LJParser{
 	private final String userSocialCapitalQuery=") > td.b-ratings-item-val > span";
 	
 	@Override
-	public void parseSocialCapital(String mode, int page, StorageInterface storage) throws IOException {
+	public void parseSocialCapital(String mode, int page, StorageInterface storage) {
 		parseSocialCapital(mode, 0, page, storage);
 	}
 
 	@Override
-	public void parseSocialCapital(String mode,int beginPage,int lastPage, StorageInterface storage) throws IOException {
+	public void parseSocialCapital(String mode,int beginPage,int lastPage, StorageInterface storage) {
 		setMode(mode);
-		setStorage(storage);
 		if (beginPage<=0){
-			this.storage.setData(parse(lastPage));
+			parse(lastPage);
 		}
 		else{
 			for (int i=beginPage; i<=lastPage; i++){
-				this.storage.addData(parse(i));
+				parse(i);
+				System.out.println(Thread.currentThread().getName()+" - "+pagesMap.size());
 			}
 		}
+	}
+	
+	public LinkedHashMap<String,String> getResult(){
+		return pagesMap;
 	}
 
 	private void setMode(String mode) {
 		if (mode.trim().equalsIgnoreCase(ModeEnum.day.name())){
-			urlString=LJParser.perDayUrl;
-		}else urlString=LJParser.forAllTime;
-	}
-
-	private void setStorage(StorageInterface storage) {
-		this.storage=storage;
+			urlString=perDayUrl;
+		}else urlString=forAllTime;
 	}
 	
-	private Map<String, String> parse(int page) throws IOException {
-		LinkedHashMap<String,String> lhMap=new LinkedHashMap<>();
-		
-		/*URL url = new URL(urlString+pageAttr+page);
-        String content = "";
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"))) {
-            for (String line; (line = reader.readLine()) != null;) {
-                content += line;
-                //System.out.println(line);
-            }
-        }
-        System.out.println(Jsoup.parse(content).text());
-        Document doc=Jsoup.parse(content);*/
-		
-		Document doc=Jsoup.connect(urlString+pageAttr+page).get();
-		Elements usersTable=doc.select(usersTableQuery);
-		for (int i=0;i<countUser;i++){
-			String nickname=usersTable.select(userId_1+i+userNicknameQuery).text();
-			String capital=usersTable.select(userId_1+i+userSocialCapitalQuery).text();
-			lhMap.put(nickname, capital);
+	private void parse(int page){
+		try{
+			Document doc=Jsoup.connect(urlString+pageAttr+page).get();
+			Elements usersTable=doc.select(usersTableQuery);
+			for (int i=0;i<countUser;i++){
+				String nickname=usersTable.select(userId_1+i+userNicknameQuery).text();
+				String capital=usersTable.select(userId_1+i+userSocialCapitalQuery).text();
+				pagesMap.put(nickname, capital);
+			}
+		}catch(IOException e){
+			e.printStackTrace();
+			parse(page);
 		}
-		return lhMap;
 	}
 
 }
