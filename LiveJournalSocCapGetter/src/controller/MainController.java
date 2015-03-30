@@ -15,6 +15,7 @@ public class MainController {
 	private static int range;
 	private static StorageInterface storage;
 	private static final int maxCountPage=5000;
+	private static final int minCountRange=49;
 	
 	private static void setDefaultMode(){
 		mode="all";
@@ -29,7 +30,7 @@ public class MainController {
 	}
 	
 	private static void setDefaultRange(){
-		range=49;
+		range=minCountRange;
 	}
 
 	private static void parseSettings(String[] args){
@@ -42,7 +43,7 @@ public class MainController {
 			}
 			if (lastPage==0) setDefaultLastPage();
 			else if (lastPage>maxCountPage) lastPage=maxCountPage;
-			if (range==0) setDefaultRange();
+			if (range<minCountRange) setDefaultRange();
 			if (beginPage>lastPage){
 				lastPage=beginPage+lastPage;
 				beginPage=lastPage-beginPage;

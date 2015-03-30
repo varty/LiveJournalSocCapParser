@@ -61,6 +61,7 @@ public class LJParserImpl implements LJParserInterface{
 			}
 		}catch(IOException e){
 			e.printStackTrace();
+			System.out.println("Repeat connect");
 			parse(page);
 		}
 	}
